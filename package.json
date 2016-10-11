@@ -9,7 +9,10 @@
   },
   "keywords": [
     "totvs",
-    "appserver"
+    "appserver",
+    "smartclient",
+    "tds",
+    "tdscli"
   ],
   "author": "Rogerio Ribeiro da Cruz",
   "license": "MIT",
