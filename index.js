@@ -1,5 +1,5 @@
 module.exports = {
-	appserver: require('appserver'),
-	smartclient: require('appserver'),
-	tds: require('tds')
+	AppServer: require('./appserver'),
+	SmartClient: require('./smartclient'),
+	TDSCli: require('./tds')
 };
