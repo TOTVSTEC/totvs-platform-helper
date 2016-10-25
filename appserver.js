@@ -156,7 +156,7 @@ class AppServer {
 			keyName = 'FlushConsoleLog';
 		}
 
-		if (config[sectionName][keyName] !== 1) {
+		if (Number(config[sectionName][keyName]) !== 1) {
 			config[sectionName][keyName] = 1;
 
 			fs.writeFileSync(iniPath + '.bak', iniContent);
