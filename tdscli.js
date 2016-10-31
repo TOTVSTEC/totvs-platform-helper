@@ -23,17 +23,8 @@ class TDS {
 
 		console.log("COMMAND:\n" + this.java + ' ' + args.join(' '));
 
-
-		//process.env.TDS_APPRE = path.normalize(__dirname + path.sep);
-		//process.env.TDS_HOME = path.normalize(__dirname + path.sep);
-		console.log("TDS_APPRE: " + process.env.TDS_APPRE);
-		console.log("CWD: " + path.normalize(__dirname + path.sep));
-
 		proc = spawn(this.java, args, {
 			cwd: path.normalize(__dirname + path.sep),
-			env: {
-				"TDS_APPRE": path.normalize(__dirname + path.sep)
-			},
 			stdio: ['ignore', 'pipe', 'pipe']
 		});
 
