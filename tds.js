@@ -119,6 +119,7 @@ class TDS {
 	}
 
 	findTdsHome() {
+		//C:\Totvs\TotvsDeveloperStudio-11.3\
 		this.tdsHome = process.env.TDS_HOME || process.env.TDS_APPRE || process.cwd();
 
 		if (!process.env.TDS_APPRE) {
@@ -144,6 +145,14 @@ class TDS {
 	}
 
 	findVersion() {
+		this.version = {
+			value: '',
+			major_minor: '',
+			major: '',
+			minor: '',
+			patch: ''
+		};
+
 		let command = [
 			this.java,
 			'-jar',
@@ -155,7 +164,7 @@ class TDS {
 		].join(' '),
 			out = null,
 			result = null,
-			test = /(?:(?:developerStudio\.full\/)|(?:br\.com\.totvs\.tds\.startup\.product\/))(\d+\.\d+\.\d+)/igm;
+			test = /(?:(?:developerStudio\.full\/)|(?:br\.com\.totvs\.tds\.(?:classic|startup)\.product\/))(\d+\.\d+\.\d+)/igm;
 
 		out = execSync(command, { encoding: 'utf8' });
 		result = test.exec(out);
@@ -163,13 +172,11 @@ class TDS {
 		if (result && result.length > 1) {
 			let v = result[1].split('.');
 
-			this.version = {
-				value: result[1],
-				major_minor: v[0] + '.' + v[1],
-				major: v[0],
-				minor: v[1],
-				patch: v[2]
-			};
+			this.version.value = result[1];
+			this.version.major_minor = v[0] + '.' + v[1];
+			this.version.major = v[0];
+			this.version.minor = v[1];
+			this.version.patch = v[2];
 		}
 
 		if (this.version.major_minor === '11.3') {
@@ -196,14 +203,10 @@ class TDS {
 			'-repository',
 			'http://ds.totvs.com/updates/tds' + this.version.major + this.version.minor,
 			'-installIU',
-			'br.com.totvs.tds.feature.tdscli.feature.group'
-		].join(' '),
-			out = null,
-			result = null,
-			test = /(?:(?:developerStudio\.full\/)|(?:br\.com\.totvs\.tds\.startup\.product\/))(\d+\.\d+\.\d+)/igm;
+			'br.com.totvs.tds.feature.tdscli.feature.group,br.com.totvs.tds.feature.sdk.feature.group'
+		].join(' ');
 
-		out = execSync(command, { encoding: 'utf8' });
-		result = test.exec(out);
+		execSync(command, { encoding: 'utf8' });
 
 		//eclipsec.exe -application org.eclipse.equinox.p2.director -repository http://ds.totvs.com/updates/tds113 -nosplash -installIU br.com.totvs.tds.feature.tdscli.feature.group
 		//http://ds.totvs.com/updates/tds113
