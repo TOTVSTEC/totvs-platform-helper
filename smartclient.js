@@ -12,8 +12,8 @@ class SmartClient {
 		this.command = executable || (os.platform() === 'win32' ? 'smartclient.exe' : 'smartclient');
 	}
 
-	run(options) {
-		var args = this._get_args(options),
+	run(options, extraArgs) {
+		var args = this._get_args(options, extraArgs),
 			cli = path.join(this.cwd, this.command),
 			deferred = Q.defer();
 
@@ -77,7 +77,7 @@ class SmartClient {
 		}
 	}
 
-	_get_args(options) {
+	_get_args(options, extras) {
 		var result = [];
 
 		options = options || {};
@@ -85,6 +85,7 @@ class SmartClient {
 		options.environment = options.environment || "ENVIRONMENT";
 		options.communication = options.communication || "TCP";
 		options.quiet = options.quiet || true;
+		options.multiple = options.multiple || true;
 		options.args = options.args || [];
 
 		if (options.program)
@@ -104,14 +105,20 @@ class SmartClient {
 			result.push('-C=' + options.communication);
 		}
 
-
 		if (options.quiet)
 			result.push('-Q');
+
+		if (options.multiple)
+			result.push('-M');
 
 		if (options.args.length > 0) {
 			for (var i = 0; i < options.args.length; i++) {
 				result.push('-A=' + options.args[i]);
 			}
+		}
+
+		if ((extras) && (Array.isArray(extras))) {
+			result = result.concat(extras);
 		}
 
 		return result;
