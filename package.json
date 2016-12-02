@@ -1,6 +1,6 @@
 {
   "name": "totvs-platform-helper",
-  "version": "0.0.6",
+  "version": "0.0.7-SNAPSHOT",
   "description": "A library to control TOTVS Plataform executables.",
   "main": "index.js",
   "repository": {
