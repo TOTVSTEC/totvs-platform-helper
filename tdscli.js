@@ -17,8 +17,20 @@ class TDS {
 	}
 
 	compile(options) {
+		return this._exec('compile', options);
+	}
+
+	generatePatch(options) {
+		return this._exec('patchgen', options);
+	}
+
+	applyPatch(options) {
+		return this._exec('patchapply', options);
+	}
+
+	_exec(command, options) {
 		var deferred = Q.defer(),
-			args = this._get_args('compile', options),
+			args = this._get_args(command, options),
 			proc = null;
 
 		console.log("COMMAND:\n" + this.java + ' ' + args.join(' '));
