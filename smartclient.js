@@ -5,19 +5,35 @@ let Q = require('q'),
 	os = require('os'),
 	spawn = require('child_process').spawn;
 
+const DEFAULT_OPTIONS = {
+	silent: false,
+	debug: false
+};
+
 class SmartClient {
 
-	constructor(directory, executable) {
-		this.cwd = path.resolve(directory || process.cwd());
-		this.command = executable || (os.platform() === 'win32' ? 'smartclient.exe' : 'smartclient');
+	constructor(options) {
+		this.stdout = '';
+		this.stderr = '';
+
+		this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
+
+		this.cwd = path.resolve(options.target ? path.dirname(options.target) : process.cwd());
+		this.command = options.target ? path.basename(options.target) : null;
+
+		if (this.command === null) {
+			if (os.platform() === 'win32')
+				this.command = 'smartclient.exe';
+			else
+				this.command = 'smartclient';
+		}
 	}
 
 	run(options, extraArgs) {
-		var args = this._get_args(options, extraArgs),
+		var _this = this,
+			args = this._get_args(options, extraArgs),
 			cli = path.join(this.cwd, this.command),
 			deferred = Q.defer();
-
-		//console.log("SMARTCLIENT: " + cmd);
 
 		this.proc = spawn(cli, args, {
 			cwd: this.cwd,
@@ -27,19 +43,15 @@ class SmartClient {
 		this.proc.stdout.on('data', function(data) {
 			var out = data.toString('ascii').trim();
 
-			if (out) {
+			if ((!_this.options.silent) && (out.trim())) {
 				console.log(out);
-			}
-
-			if (out.indexOf('Application Server started on port') > -1) {
-				deferred.resolve();
 			}
 		});
 
 		this.proc.stderr.on('data', function(data) {
-			var err = data.toString('ascii').replace(/^Warning: NLS unused message: (.*)$/gm, "").trim();
+			var err = data.toString('ascii');//.replace(/^Warning: NLS unused message: (.*)$/gm, "").trim();
 
-			if (err) {
+			if ((!_this.options.silent) && (err.trim())) {
 				console.error(err);
 			}
 		});

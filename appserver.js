@@ -1,6 +1,6 @@
 'use strict';
 
-let	Q = require('q'),
+let Q = require('q'),
 	path = require('path'),
 	os = require('os'),
 	fs = require('fs'),
@@ -10,15 +10,33 @@ let	Q = require('q'),
 const TCP_STARTED = 'Application Server started on port ';
 const HTTP_STARTED = 'HTTP Server started on port ';
 
+const DEFAULT_OPTIONS = {
+	silent: false,
+	debug: false
+};
+
 class AppServer {
 
-	constructor(directory, executable) {
+	constructor(options) {
 		this.tcpPort = 0;
 		this.httpPort = 0;
 		this.proc = null;
+		this.stdout = '';
+		this.stderr = '';
 
-		this.cwd = path.resolve(directory || process.cwd());
-		this.command = executable || (os.platform() === 'win32' ? 'appserver.exe' : 'appsrvlinux');
+		this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
+
+		this.cwd = path.resolve(options.target ? path.dirname(options.target) : process.cwd());
+		this.command = options.target ? path.basename(options.target) : null;
+
+		if (this.command === null) {
+			if (os.platform() === 'win32')
+				this.command = 'appserver.exe';
+			else if (os.platform() === 'linux')
+				this.command = 'appsrvlinux';
+			else if (os.platform() === 'darwin')
+				this.command = 'appserver';
+		}
 
 		var exe = path.join(this.cwd, this.command);
 
@@ -46,12 +64,14 @@ class AppServer {
 			this.proc.stdout.on('data', function(data) {
 				var out = data.toString('ascii');
 
-				if (out.trim()) {
+				this.stdout += out;
+
+				if ((!this.options.silent) && (out.trim())) {
 					console.log(out);
 				}
 
 				if (this.tcpPort === 0) {
-					this.readPorts(out);
+					this.readServerInfo(out);
 				}
 
 				if (this.tcpPort !== 0) {
@@ -62,7 +82,7 @@ class AppServer {
 			this.proc.stderr.on('data', function(data) {
 				var err = data.toString('ascii');
 
-				if (err.trim()) {
+				if ((!this.options.silent) && (err.trim())) {
 					console.error(err);
 				}
 			});
@@ -103,7 +123,7 @@ class AppServer {
 		this.httpPort = 0;
 	}
 
-	readPorts(output) {
+	readServerInfo(output) {
 		var pos = output.indexOf(TCP_STARTED);
 		var end = null;
 
@@ -122,6 +142,13 @@ class AppServer {
 			end = output.indexOf('.', pos);
 
 			this.httpPort = Number(output.substring(pos, end));
+		}
+
+		var test = /(?:TOTVS - Build )(\d{1}\.\d{2}\.\d{6}\w{1})(?: - )/igm,
+			result = test.exec(output);
+
+		if (result && result.length > 1) {
+			this.build =  result[1];
 		}
 	}
 

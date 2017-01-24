@@ -7,13 +7,19 @@ let Q = require('q'),
 	spawn = require('child_process').spawn,
 	execSync = require('child_process').execSync;
 
+const DEFAULT_OPTIONS = {
+	silent: false,
+	debug: false
+};
+
 class TDS {
 
-	constructor(directory) {
+	constructor(options) {
 		this.findJava();
 
-		this.cwd = path.resolve(directory || process.cwd());
-		this.cwd = path.normalize(this.cwd + path.sep);
+		this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
+		this.stdout = "";
+		this.stderr = "";
 	}
 
 	compile(options) {
@@ -29,11 +35,17 @@ class TDS {
 	}
 
 	_exec(command, options) {
-		var deferred = Q.defer(),
+		var _this = this,
+			deferred = Q.defer(),
 			args = this._get_args(command, options),
 			proc = null;
 
-		console.log("COMMAND:\n" + this.java + ' ' + args.join(' '));
+		this.stdout = "";
+		this.stderr = "";
+
+		if (this.options.debug) {
+			console.log("COMMAND:\n" + this.java + ' ' + args.join(' '));
+		}
 
 		proc = spawn(this.java, args, {
 			cwd: path.normalize(__dirname + path.sep),
@@ -45,7 +57,9 @@ class TDS {
 			out = out.replace(/^>>>>> Compil.*(.|[\r\n])*?>>>>\s*$/gm, "0");
 			out = out.replace(/^>>>>.*(.|[\r\n])*?>>>>\s*$/gm, "");
 
-			if (out.trim()) {
+			this.stdout += out;
+
+			if ((!_this.options.silent) && (out.trim())) {
 				console.log(out);
 			}
 		});
@@ -54,7 +68,9 @@ class TDS {
 			var err = data.toString('utf8');
 			err = err.replace(/^Warning: NLS unused message: (.*)$/gm, "");
 
-			if (err.trim()) {
+			this.stderr += err;
+
+			if ((!_this.options.silent) && (err.trim())) {
 				console.error(err);
 			}
 		});
