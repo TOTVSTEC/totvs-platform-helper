@@ -26,12 +26,28 @@ class TDS {
 		return this._exec('compile', options);
 	}
 
+	remove(options) {
+		return this._exec('deleteProg', options);
+	}
+
 	generatePatch(options) {
 		return this._exec('patchgen', options);
 	}
 
 	applyPatch(options) {
 		return this._exec('patchapply', options);
+	}
+
+	listPatch(options) {
+		return this._exec('patchinfo', options);
+	}
+
+	defragRPO(options) {
+		return this._exec('defragRPO', options);
+	}
+
+	clearLog(options) {
+		return this._exec('clearLog', options);
 	}
 
 	_exec(command, options) {
