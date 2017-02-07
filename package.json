@@ -23,5 +23,13 @@
   "dependencies": {
     "ini": "^1.3.4",
     "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "totvstec-tools": "^1.0.1"
+  },
+  "scripts": {
+    "release": "totvstec release --npm-publish",
+    "release:minor": "totvstec release minor --npm-publish",
+    "release:major": "totvstec release major --npm-publish"
   }
 }
