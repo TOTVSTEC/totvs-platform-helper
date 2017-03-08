@@ -148,7 +148,9 @@ class AppServer {
 			result = test.exec(output);
 
 		if (result && result.length > 1) {
-			this.build =  result[1];
+			this.build = result[1];
+		} else {
+			this.build = "7.00.170117A";
 		}
 	}
 

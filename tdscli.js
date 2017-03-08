@@ -141,16 +141,25 @@ class TDS {
 			this.java = path.join(process.env.TDS_HOME, 'jre', 'bin', 'java');
 		}
 		else*/
-		if (process.env.JAVA_HOME) {
-			this.java = path.join(process.env.JAVA_HOME, 'bin', 'java');
-		}
-		else if (process.env.JRE_HOME) {
-			this.java = path.join(process.env.JRE_HOME, 'bin', 'java');
+
+		switch (os.platform()) {
+			case 'win32': {
+
+				if (process.env.JAVA_HOME) {
+					this.java = path.join(process.env.JAVA_HOME, 'bin', 'java');
+				}
+				else if (process.env.JRE_HOME) {
+					this.java = path.join(process.env.JRE_HOME, 'bin', 'java');
+				}
+
+				this.java += '.exe';
+			}
+			case 'darwin': {
+				this.java = 'java';
+			}
 		}
 
-		if (os.platform() === 'win32') {
-			this.java += '.exe';
-		}
+
 
 		/*
 		if (this.java.indexOf(' ') !== -1) {
