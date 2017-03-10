@@ -23,6 +23,7 @@ class AppServer {
 		this.proc = null;
 		this.stdout = '';
 		this.stderr = '';
+		this.build = "7.00.170117A";
 
 		this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
 
@@ -48,8 +49,7 @@ class AppServer {
 	}
 
 	start() {
-		var _this = this,
-			cli = path.join(this.cwd, this.command),
+		var cli = path.join(this.cwd, this.command),
 			deferred = Q.defer();
 
 		if (cli === null) {
@@ -61,7 +61,7 @@ class AppServer {
 				stdio: ['ignore', 'pipe', 'pipe']
 			});
 
-			this.proc.stdout.on('data', function(data) {
+			this.proc.stdout.on('data', (data) => {
 				var out = data.toString('ascii');
 
 				this.stdout += out;
@@ -77,9 +77,9 @@ class AppServer {
 				if (this.tcpPort !== 0) {
 					deferred.resolve();
 				}
-			}.bind(this));
+			});
 
-			this.proc.stderr.on('data', function(data) {
+			this.proc.stderr.on('data', (data) => {
 				var err = data.toString('ascii');
 
 				if ((!this.options.silent) && (err.trim())) {
@@ -87,7 +87,7 @@ class AppServer {
 				}
 			});
 
-			this.proc.on('close', function(code) {
+			this.proc.on('close', (code) => {
 				if (code !== 0) {
 					deferred.reject(new Error("AppServer process exited with code " + code));
 				}
@@ -96,7 +96,7 @@ class AppServer {
 				}
 			});
 
-			this.proc.on('exit', function(code) {
+			this.proc.on('exit', (code) => {
 				if (code !== 0) {
 					deferred.reject(new Error("AppServer process exited with code " + code));
 				}
@@ -105,7 +105,7 @@ class AppServer {
 				}
 			});
 
-			this.proc.on('error', function(err) {
+			this.proc.on('error', (err) => {
 				deferred.reject(err);
 			});
 		}
@@ -149,8 +149,6 @@ class AppServer {
 
 		if (result && result.length > 1) {
 			this.build = result[1];
-		} else {
-			this.build = "7.00.170117A";
 		}
 	}
 
@@ -161,7 +159,7 @@ class AppServer {
 			sectionName = '',
 			keyName = '';
 
-		Object.keys(config).forEach(function(section, index) {
+		Object.keys(config).forEach((section, index) => {
 			if (section.toUpperCase() === 'GENERAL') {
 				sectionName = section;
 			}
@@ -175,7 +173,7 @@ class AppServer {
 			}
 		}
 
-		Object.keys(config[sectionName]).forEach(function(key, index) {
+		Object.keys(config[sectionName]).forEach((key, index) => {
 			if (key.toUpperCase() === 'FLUSHCONSOLELOG') {
 				keyName = key;
 			}

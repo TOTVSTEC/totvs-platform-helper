@@ -25,6 +25,7 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
+    "jshint": "^2.9.4",
     "totvstec-tools": "^1.0.1"
   },
   "scripts": {
