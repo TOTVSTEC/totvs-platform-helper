@@ -25,12 +25,14 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
+    "jscs": "^3.0.7",
     "jshint": "^2.9.4",
     "totvstec-tools": "^1.0.1"
   },
   "scripts": {
     "release": "totvstec release --npm-publish",
     "release:minor": "totvstec release minor --npm-publish",
-    "release:major": "totvstec release major --npm-publish"
+    "release:major": "totvstec release major --npm-publish",
+    "postinstall": "node ./scripts/postinstall.js"
   }
 }
