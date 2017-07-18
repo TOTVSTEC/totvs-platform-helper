@@ -154,7 +154,8 @@ class TDS {
 
 				this.java += '.exe';
 			}
-			case 'darwin': {
+			case 'darwin':
+			case 'linux': {
 				this.java = 'java';
 			}
 		}
