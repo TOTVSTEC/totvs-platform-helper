@@ -3,7 +3,9 @@
 
 let path = require('path'),
 	fs = require('fs'),
-	execFileSync = require('child_process').execFileSync;
+	shelljs = require('shelljs');
+	//execFileSync = require('child_process').execFileSync,
+	
 
 const ARCHITECTURES = ['x86', 'x86_64'];
 
@@ -16,8 +18,8 @@ if (process.platform !== 'win32') {
 
 		if (fs.existsSync(file)) {
 			console.log('chmod +x ' + file);
-
-			execFileSync('chmod', ['+x', file]);
+			shelljs.chmod("+x", file);
+			//execFileSync('chmod', ['+x', file]);
 		}
 	});
 }
