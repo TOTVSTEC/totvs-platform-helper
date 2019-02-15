@@ -3,13 +3,15 @@
 let Q = require('q'),
 	path = require('path'),
 	os = require('os'),
-	fs = require('fs'),
-	spawn = require('child_process').spawn,
-	execSync = require('child_process').execSync;
+	spawn = require('child_process').spawn;
+
+const DEFAULT_VERSION = 11.4,
+	SUPORTED_VERSIONS = [11.3, 11.4];
 
 const DEFAULT_OPTIONS = {
 	silent: false,
-	debug: false
+	debug: false,
+	version: DEFAULT_VERSION
 };
 
 class TDS {
@@ -20,6 +22,10 @@ class TDS {
 		this.options = Object.assign({}, DEFAULT_OPTIONS, options || {});
 		this.stdout = "";
 		this.stderr = "";
+
+		if (SUPORTED_VERSIONS.indexOf(this.options.version) === -1) {
+			this.options.version = DEFAULT_VERSION;
+		}
 	}
 
 	compile(options) {
@@ -107,7 +113,7 @@ class TDS {
 		let args = [
 			'-Dfile.encoding=UTF-8',
 			'-jar',
-			path.join(__dirname, 'tdscli.jar')
+			path.join(__dirname, `tdscli-${this.options.version}.jar`)
 		];
 
 		args.push(target);
@@ -137,14 +143,8 @@ class TDS {
 	}
 
 	findJava() {
-		/*if (process.env.TDS_HOME) {
-			this.java = path.join(process.env.TDS_HOME, 'jre', 'bin', 'java');
-		}
-		else*/
-
 		switch (os.platform()) {
-			case 'win32': {
-
+			case 'win32':
 				if (process.env.JAVA_HOME) {
 					this.java = path.join(process.env.JAVA_HOME, 'bin', 'java');
 				}
@@ -153,19 +153,15 @@ class TDS {
 				}
 
 				this.java += '.exe';
-			}
+
+				break;
 			case 'darwin':
-			case 'linux': {
+			case 'linux':
 				this.java = 'java';
-			}
+
+				break;
 		}
 
-
-
-		/*
-		if (this.java.indexOf(' ') !== -1) {
-			this.java = '"' + this.java + '"';
-		}*/
 	}
 
 	changeOptions(options) {

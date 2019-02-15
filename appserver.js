@@ -148,36 +148,49 @@ class AppServer {
 		var iniPath = path.join(this.cwd, 'appserver.ini'),
 			iniContent = fs.readFileSync(iniPath, 'utf-8'),
 			config = ini.parse(iniContent),
-			sectionName = '',
-			keyName = '';
+			sectionName = '';
 
-		Object.keys(config).forEach((section, index) => {
+		Object.keys(config).forEach((section) => {
 			if (section.toUpperCase() === 'GENERAL') {
 				sectionName = section;
 			}
 		});
 
 		if (sectionName === '') {
-			sectionName = 'General';
+			sectionName = 'GENERAL';
 
 			if (config[sectionName] === undefined) {
 				config[sectionName] = {};
 			}
 		}
 
-		Object.keys(config[sectionName]).forEach((key, index) => {
-			if (key.toUpperCase() === 'FLUSHCONSOLELOG') {
-				keyName = key;
+		let setIniValue = (targetKey, value) => {
+			let keyName = '';
+
+			Object.keys(config[sectionName]).forEach((key) => {
+				if (key.toUpperCase() === targetKey.toUpperCase()) {
+					keyName = key;
+				}
+			});
+
+			if (keyName === '') {
+				keyName = targetKey;
 			}
-		});
 
-		if (keyName === '') {
-			keyName = 'FlushConsoleLog';
-		}
+			if (Number(config[sectionName][keyName]) !== value) {
+				config[sectionName][keyName] = value;
+				return true;
+			}
 
-		if (Number(config[sectionName][keyName]) !== 1) {
-			config[sectionName][keyName] = 1;
+			return false;
+		};
 
+		let changed = false;
+		changed |= setIniValue('FLUSHCONSOLELOG', 1);
+		changed |= setIniValue('ASYNCCONSOLELOG', 0);
+		//changed |= setIniValue('MAXSTRINGSIZE', 10);
+
+		if (changed) {
 			fs.writeFileSync(iniPath + '.bak', iniContent);
 			fs.writeFileSync(iniPath, ini.stringify(config, { whitespace: false }));
 		}
