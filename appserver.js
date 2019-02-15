@@ -7,9 +7,6 @@ let Q = require('q'),
 	ini = require('ini'),
 	spawn = require('child_process').spawn;
 
-const TCP_STARTED = 'Application Server started on port ';
-const HTTP_STARTED = 'HTTP Server started on port ';
-
 const DEFAULT_OPTIONS = {
 	silent: false,
 	debug: false
@@ -124,32 +121,27 @@ class AppServer {
 	}
 
 	readServerInfo(output) {
-		var pos = output.indexOf(TCP_STARTED);
-		var end = null;
+		var test = null,
+			result = null;
 
-		if (pos > -1) {
-			pos += TCP_STARTED.length;
-			end = output.indexOf('.', pos);
-
-			this.tcpPort = Number(output.substring(pos, end));
-		}
-
-		pos = output.indexOf(HTTP_STARTED);
-		end = null;
-
-		if (pos > -1) {
-			pos += HTTP_STARTED.length;
-			end = output.indexOf('.', pos);
-
-			this.httpPort = Number(output.substring(pos, end));
-		}
-
-		var test = /(?:TOTVS - Build )(\d{1}\.\d{2}\.\d{6}\w{1})(?: - )/igm,
-			result = test.exec(output);
-
-		if (result && result.length > 1) {
+		test = /(?:TOTVS - Build )(\d{1}\.\d{2}\.\d{6}\w{1})(?: - )/igm;
+		result = test.exec(output);
+		if ((result) && (result.length > 1)) {
 			this.build = result[1];
 		}
+
+		test = /HTTP Server started on port (\d+)/igm;
+		result = test.exec(output);
+		if ((result) && (result.length > 1)) {
+			this.httpPort = Number(result[1]);
+		}
+
+		test = /Application Server started on port (\d+)/igm;
+		result = test.exec(output);
+		if ((result) && (result.length > 1)) {
+			this.tcpPort = Number(result[1]);
+		}
+
 	}
 
 	setIni() {
